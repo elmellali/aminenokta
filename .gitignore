@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Zip backups & archives
+*.zip
+*.tar.gz
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+*.code-workspace
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Antigravity agent temp data
+.gemini/
