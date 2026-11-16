@@ -69,8 +69,8 @@ export const DEFAULT_CONFIG = {
     party: 'التجمع الوطني للأحرار (RNI)',
     mainReceptionDay: 'كل خميس على الساعة 17:00 (5 زوالاً)',
     officeAddress: 'مقر حزب التجمع الوطني للأحرار، مديونة المركز (شارع الحسن الثاني، قرب بلدية مديونة)، إقليم مديونة',
-    phone: '+212 5 22 51 04 20',
-    whatsapp: '+212 6 61 98 42 10',
+    phone: '+212 6 12 26 64 18',
+    whatsapp: '+212 6 12 26 64 18',
     email: 'contact@aminenokta.ma',
     photoUrl: '/images/dr_amine_nokta.jpg'
   },

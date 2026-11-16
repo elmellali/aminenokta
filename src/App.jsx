@@ -48,12 +48,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-900 selection:bg-amber-400 selection:text-[#00274d]">
-      
+
       {/* Top Reception Announcement Bar */}
       <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-white py-2 px-4 text-xs font-bold text-center border-b border-amber-400 flex items-center justify-center gap-2 shadow-sm no-print">
         <Sparkles className="w-4 h-4 text-[#faecc9] animate-spin" />
         <span>
-          جلسات الاستماع الأسبوعية المباشرة: <strong>كل خميس على الساعة 5 زوالاً</strong> بمقر الحزب بمديونة المركز (شارع الحسن الثاني)
+          مواعيد التواصل الأسبوعية المباشرة: <strong>كل خميس على الساعة 5 زوالاً</strong> بمقر الحزب بمديونة المركز (شارع الحسن الثاني)
         </span>
         <button
           onClick={() => handleStartBooking()}

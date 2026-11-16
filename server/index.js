@@ -3,7 +3,48 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
 const db = require('./db');
+
+// ---- Admin authentication ----
+// Set ADMIN_PASSWORD in the hosting environment (Hostinger > Node.js > Environment variables).
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const TOKEN_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+
+if (!ADMIN_PASSWORD) {
+  console.warn('⚠️  ADMIN_PASSWORD is not set — admin login is disabled until it is configured.');
+}
+
+function signToken(expiresAt) {
+  return crypto.createHmac('sha256', 'nokta-admin:' + ADMIN_PASSWORD).update(String(expiresAt)).digest('hex');
+}
+
+function safeEqual(a, b) {
+  const ba = Buffer.from(String(a));
+  const bb = Buffer.from(String(b));
+  return ba.length === bb.length && crypto.timingSafeEqual(ba, bb);
+}
+
+function issueToken() {
+  const expiresAt = Date.now() + TOKEN_TTL_MS;
+  return `${expiresAt}.${signToken(expiresAt)}`;
+}
+
+function isValidToken(token) {
+  if (!ADMIN_PASSWORD || !token) return false;
+  const [expiresAt, sig] = String(token).split('.');
+  if (!expiresAt || !sig || Number(expiresAt) < Date.now()) return false;
+  return safeEqual(sig, signToken(expiresAt));
+}
+
+function requireAdmin(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : '';
+  if (!isValidToken(token)) {
+    return res.status(401).json({ success: false, error: 'انتهت الجلسة، المرجو تسجيل الدخول من جديد' });
+  }
+  next();
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,7 +73,7 @@ app.get('/api/config', (req, res) => {
 });
 
 // Update configuration (schedule, office info)
-app.put('/api/config', (req, res) => {
+app.put('/api/config', requireAdmin, (req, res) => {
   try {
     const updated = db.updateConfig(req.body);
     res.json({ success: true, data: updated });
@@ -109,7 +150,7 @@ app.get('/api/slots', (req, res) => {
 });
 
 // Get all appointments (Admin & filtering)
-app.get('/api/appointments', (req, res) => {
+app.get('/api/appointments', requireAdmin, (req, res) => {
   try {
     const { status, commune, date, search } = req.query;
     let list = db.getAppointments();
@@ -154,7 +195,9 @@ app.get('/api/appointments/track/:code', (req, res) => {
       });
     }
 
-    res.json({ success: true, data: apt });
+    // Never expose personal data (CIN, phone, email) on the public tracking page
+    const { cin, phone, email, ...publicData } = apt;
+    res.json({ success: true, data: publicData });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -165,10 +208,10 @@ app.post('/api/appointments', (req, res) => {
   try {
     const { fullName, phone, communeId, purposeId, preferredDate, timeSlot, subject } = req.body;
 
-    if (!fullName || !phone || !communeId || !preferredDate || !timeSlot) {
+    if (!fullName || !phone || !preferredDate || !timeSlot) {
       return res.status(400).json({
         success: false,
-        error: 'المرجو ملء جميع الحقول الإلزامية (الاسم، الهاتف، الجماعة، التاريخ، والوقت)'
+        error: 'المرجو ملء جميع الحقول الإلزامية (الاسم، الهاتف، التاريخ، والوقت)'
       });
     }
 
@@ -178,8 +221,8 @@ app.post('/api/appointments', (req, res) => {
 
     const newAppointment = db.createAppointment({
       ...req.body,
-      communeName: communeObj ? communeObj.name : communeId,
-      purposeTitle: purposeObj ? purposeObj.title : purposeId
+      communeName: communeObj ? communeObj.name : '',
+      purposeTitle: purposeObj ? purposeObj.title : ''
     });
 
     res.status(201).json({
@@ -193,7 +236,7 @@ app.post('/api/appointments', (req, res) => {
 });
 
 // Update an appointment (Admin accept, reschedule, complete, cancel, add room/notes)
-app.patch('/api/appointments/:id', (req, res) => {
+app.patch('/api/appointments/:id', requireAdmin, (req, res) => {
   try {
     const { id } = req.params;
     const updated = db.updateAppointment(id, req.body);
@@ -207,7 +250,7 @@ app.patch('/api/appointments/:id', (req, res) => {
 });
 
 // Delete an appointment
-app.delete('/api/appointments/:id', (req, res) => {
+app.delete('/api/appointments/:id', requireAdmin, (req, res) => {
   try {
     const { id } = req.params;
     const deleted = db.deleteAppointment(id);
@@ -221,7 +264,7 @@ app.delete('/api/appointments/:id', (req, res) => {
 });
 
 // Generate WhatsApp notification link
-app.post('/api/appointments/:id/whatsapp', (req, res) => {
+app.post('/api/appointments/:id/whatsapp', requireAdmin, (req, res) => {
   try {
     const { id } = req.params;
     const apt = db.getAppointmentById(id);
@@ -314,15 +357,14 @@ app.get('/api/advocacy', (req, res) => {
 app.post('/api/admin/login', (req, res) => {
   try {
     const { password } = req.body;
-    // Default master PIN / password for Dr. Amine Nokta's parliamentary office
-    if (password === 'nokta2026' || password === 'mediouna2026' || password === 'admin') {
+    if (ADMIN_PASSWORD && typeof password === 'string' && safeEqual(password, ADMIN_PASSWORD)) {
       res.json({
         success: true,
         user: {
           name: 'د. أمين نقطى',
           role: 'النائب البرلماني ومسؤول الديوان',
           accessLevel: 'parliamentary_admin',
-          token: 'token-nokta-mdn-' + Date.now()
+          token: issueToken()
         }
       });
     } else {

@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Check, Calendar, ArrowRight, Shield } from 'lucide-react';
-import StepPurpose from './StepPurpose';
-import StepCommune from './StepCommune';
 import StepDateTime from './StepDateTime';
 import StepCitizenInfo from './StepCitizenInfo';
 import StepConfirmation from './StepConfirmation';
@@ -16,7 +14,7 @@ export default function BookingWizard({
   const [selectedPurpose, setSelectedPurpose] = useState(null);
   const [selectedCommune, setSelectedCommune] = useState(null);
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
-  const [meetingType, setMeetingType] = useState('in_person');
+  const meetingType = 'in_person';
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedSlot, setSelectedSlot] = useState('');
   const [citizenData, setCitizenData] = useState({
@@ -30,6 +28,14 @@ export default function BookingWizard({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedAppointment, setConfirmedAppointment] = useState(null);
   const [submitError, setSubmitError] = useState('');
+  const sectionRef = useRef(null);
+  const isFirstRender = useRef(true);
+
+  // Bring the top of the wizard into view whenever the step changes
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [step]);
 
   // Handle initial commune if passed from communes grid
   useEffect(() => {
@@ -42,11 +48,9 @@ export default function BookingWizard({
   }, [initialCommuneId, config]);
 
   const stepsList = [
-    { number: 1, label: 'نوع الموعد' },
-    { number: 2, label: 'الجماعة والحي' },
-    { number: 3, label: 'التاريخ والتوقيت' },
-    { number: 4, label: 'بيانات المواطن' },
-    { number: 5, label: 'تأكيد الموعد' },
+    { number: 1, label: 'التاريخ والتوقيت' },
+    { number: 2, label: 'معلوماتكم' },
+    { number: 3, label: 'تأكيد الموعد' },
   ];
 
   const handleFinalSubmit = async () => {
@@ -59,11 +63,11 @@ export default function BookingWizard({
         cin: citizenData.cin,
         phone: citizenData.phone,
         email: citizenData.email,
-        communeId: selectedCommune.id,
-        communeName: selectedCommune.name,
+        communeId: selectedCommune?.id || '',
+        communeName: selectedCommune?.name || '',
         neighborhood: selectedNeighborhood,
-        purposeId: selectedPurpose.id,
-        purposeTitle: selectedPurpose.title,
+        purposeId: selectedPurpose?.id || '',
+        purposeTitle: selectedPurpose?.title || '',
         subject: citizenData.subject,
         details: citizenData.details,
         appointmentType: meetingType,
@@ -73,7 +77,7 @@ export default function BookingWizard({
 
       const result = await createAppointment(payload);
       setConfirmedAppointment(result);
-      setStep(5);
+      setStep(3);
     } catch (err) {
       setSubmitError(err.message || 'حدث خطأ أثناء حفظ الموعد. المرجو المحاولة مجدداً.');
     } finally {
@@ -93,7 +97,7 @@ export default function BookingWizard({
   };
 
   return (
-    <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto" id="book-section">
+    <section ref={sectionRef} className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto scroll-mt-28" id="book-section">
       
       {/* Stepper Navigation Indicator */}
       <div className="mb-10 no-print">
@@ -135,59 +139,38 @@ export default function BookingWizard({
         </div>
       </div>
 
-      {submitError && (
-        <div className="mb-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-xs font-bold text-center">
-          {submitError}
-        </div>
-      )}
-
       {/* Step Components */}
       <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl">
         {step === 1 && (
-          <StepPurpose
-            purposes={config?.purposes || []}
-            selectedPurpose={selectedPurpose}
-            onSelectPurpose={(p) => setSelectedPurpose(p)}
+          <StepDateTime
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            selectedSlot={selectedSlot}
+            setSelectedSlot={setSelectedSlot}
             onNext={() => setStep(2)}
           />
         )}
 
         {step === 2 && (
-          <StepCommune
-            communes={config?.communes || []}
-            selectedCommune={selectedCommune}
-            selectedNeighborhood={selectedNeighborhood}
-            onSelectCommune={(c) => setSelectedCommune(c)}
-            onSelectNeighborhood={(n) => setSelectedNeighborhood(n)}
-            onNext={() => setStep(3)}
-            onBack={() => setStep(1)}
-          />
-        )}
-
-        {step === 3 && (
-          <StepDateTime
-            meetingType={meetingType}
-            setMeetingType={setMeetingType}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            selectedSlot={selectedSlot}
-            setSelectedSlot={setSelectedSlot}
-            onNext={() => setStep(4)}
-            onBack={() => setStep(2)}
-          />
-        )}
-
-        {step === 4 && (
           <StepCitizenInfo
+            purposes={config?.purposes || []}
+            communes={config?.communes || []}
+            selectedPurpose={selectedPurpose}
+            onSelectPurpose={setSelectedPurpose}
+            selectedCommune={selectedCommune}
+            onSelectCommune={setSelectedCommune}
+            selectedNeighborhood={selectedNeighborhood}
+            onSelectNeighborhood={setSelectedNeighborhood}
             citizenData={citizenData}
             setCitizenData={setCitizenData}
             onSubmit={handleFinalSubmit}
-            onBack={() => setStep(3)}
+            onBack={() => setStep(1)}
             isSubmitting={isSubmitting}
+            submitError={submitError}
           />
         )}
 
-        {step === 5 && confirmedAppointment && (
+        {step === 3 && confirmedAppointment && (
           <StepConfirmation
             appointment={confirmedAppointment}
             onReset={handleReset}

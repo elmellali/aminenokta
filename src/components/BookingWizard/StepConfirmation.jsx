@@ -98,9 +98,9 @@ export default function StepConfirmation({ appointment, onReset, onGoToTrack }) 
               <span className="text-[11px] font-bold text-slate-500 block mb-0.5">
                 الانتماء الترابي بإقليم مديونة:
               </span>
-              <p className="text-sm font-black text-[#00274d]">{appointment.communeName}</p>
+              <p className="text-sm font-black text-[#00274d]">{appointment.communeName || 'غير محدد'}</p>
               <p className="text-slate-600 font-medium">الحي / الدوار: {appointment.neighborhood || 'غير محدد'}</p>
-              <p className="text-slate-500 text-[11px]">المجال: {appointment.purposeTitle}</p>
+              <p className="text-slate-500 text-[11px]">المجال: {appointment.purposeTitle || 'غير محدد'}</p>
             </div>
           </div>
 

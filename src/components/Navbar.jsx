@@ -41,11 +41,11 @@ export default function Navbar({ activeTab, setActiveTab, onOpenBookModal }) {
               مقر الحزب بمديونة المركز
             </span>
             <a
-              href="tel:0522510420"
+              href="tel:+212612266418"
               className="hidden md:flex items-center gap-1 hover:text-white transition-colors"
             >
               <Phone className="w-3.5 h-3.5 text-sky-400" />
-              05 22 51 04 20
+              <span dir="ltr">06 12 26 64 18</span>
             </a>
           </div>
         </div>
@@ -165,7 +165,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenBookModal }) {
 
           <div className="pt-2 border-t border-sky-800/80 flex flex-col gap-2">
             <a
-              href="https://wa.me/212661984210"
+              href="https://wa.me/212612266418"
               target="_blank"
               rel="noreferrer"
               className="w-full text-center py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow"

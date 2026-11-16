@@ -87,24 +87,7 @@ export default function TrackAppointment({ initialCode = '', onGoToBook }) {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          {/* Quick Demo Test Buttons */}
-          <div className="flex items-center gap-2 text-[11px] text-slate-500">
-            <span>نماذج جاهزة للاختبار:</span>
-            <button
-              onClick={() => { setCode('NOKTA-MDN-7412'); handleSearch('NOKTA-MDN-7412'); }}
-              className="text-sky-700 underline hover:text-sky-900 font-mono font-bold"
-            >
-              NOKTA-MDN-7412
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => { setCode('NOKTA-MDN-3320'); handleSearch('NOKTA-MDN-3320'); }}
-              className="text-sky-700 underline hover:text-sky-900 font-mono font-bold"
-            >
-              NOKTA-MDN-3320
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
 
           <button
             onClick={() => handleSearch()}
@@ -135,7 +118,7 @@ export default function TrackAppointment({ initialCode = '', onGoToBook }) {
                 {appointment.trackingCode}
               </h3>
               <p className="text-xs text-sky-100 mt-0.5">
-                المواطن: {appointment.fullName} • {appointment.communeName}
+                المواطن: {appointment.fullName}{appointment.communeName ? ` • ${appointment.communeName}` : ''}
               </p>
             </div>
 

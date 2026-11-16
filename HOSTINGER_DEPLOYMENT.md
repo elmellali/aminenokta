@@ -37,6 +37,7 @@ If your Hostinger plan includes the **Node.js** feature in hPanel:
    * **Application Mode:** **Production**.
    * **Application Root:** `public_html` (or `/home/uXXXXX/domains/yourdomain.com/public_html`).
    * **Application Startup File:** `index.js`
+   * **Environment variable (required):** `ADMIN_PASSWORD` = a strong secret password for the office dashboard. Without it, admin login is disabled.
 3. Click **Save** / **Create**.
 
 ### Step 4: Install Dependencies & Run
@@ -132,6 +133,6 @@ sudo certbot --nginx -d yourdomain.ma -d www.yourdomain.ma
 ## Administrative Access on Hostinger
 
 * **Admin Portal URL:** `https://yourdomain.com` $\rightarrow$ Click **🔒 ديوان النائب** in the header.
-* **Master PIN:** `nokta2026`
+* **Password:** the value of the `ADMIN_PASSWORD` environment variable (never commit it to the repository). Changing it logs out all open sessions.
 * **Appointments Database:** Stored safely in `server/data/appointments.json` (easy to backup anytime from Hostinger File Manager).
 

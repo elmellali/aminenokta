@@ -37,4 +37,3 @@
 npm start
 ```
 * **الرابط:** [http://localhost:5000](http://localhost:5000)
-* **رمز دخول ديوان النائب:** `nokta2026`

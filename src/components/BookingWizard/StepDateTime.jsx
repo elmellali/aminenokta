@@ -3,14 +3,11 @@ import { Calendar, Clock, MapPin, ArrowLeft, ArrowRight, Sparkles, AlertCircle }
 import { fetchSlots } from '../../api';
 
 export default function StepDateTime({
-  meetingType,
-  setMeetingType,
   selectedDate,
   setSelectedDate,
   selectedSlot,
   setSelectedSlot,
-  onNext,
-  onBack
+  onNext
 }) {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [slotsData, setSlotsData] = useState(null);
@@ -81,20 +78,11 @@ export default function StepDateTime({
     return () => { isMounted = false; };
   }, [selectedDate]);
 
-  const meetingTypes = [
-    {
-      id: 'in_person',
-      title: 'حضوري بمقر الحزب بمديونة',
-      subtitle: 'شارع الحسن الثاني (قرب بلدية مديونة المركز)',
-      icon: <MapPin className="w-5 h-5 text-sky-600" />
-    }
-  ];
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center max-w-xl mx-auto space-y-2">
         <h3 className="text-2xl font-black text-slate-900">
-          الخطوة 3: تحديد توقيت الاستقبال (كل خميس على 17:00)
+          الخطوة 1: اختر يوم الخميس والتوقيت
         </h3>
         <p className="text-sm text-slate-600">
           المواعيد مخصصة حصرياً <strong>كل يوم خميس ابتداءً من الساعة 5 زوالاً (17:00)</strong> بمقر الحزب بمديونة المركز.
@@ -116,40 +104,11 @@ export default function StepDateTime({
         </div>
       </div>
 
-      {/* 1. Meeting Type Selector */}
-      <div className="space-y-2">
-        <label className="block text-xs font-bold text-slate-700">
-          1. صيغة اللقاء:
-        </label>
-        <div className="max-w-md">
-          <div
-            className="p-3.5 rounded-xl border-2 border-sky-600 bg-sky-50 shadow-sm flex items-center justify-between gap-3 select-none"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-sky-600 text-white shrink-0">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <div>
-                <h5 className="text-xs font-black text-slate-900">
-                  حضوري بمقر الحزب بمديونة
-                </h5>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  شارع الحسن الثاني (قرب بلدية مديونة المركز)
-                </p>
-              </div>
-            </div>
-            <span className="text-[10px] font-bold text-sky-700 bg-sky-100 px-2.5 py-0.5 rounded-full border border-sky-200">
-              معتمد حصرياً ✓
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* 2. Choose Thursday Date */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="block text-xs font-bold text-slate-700">
-            2. اختر يوم الخميس المناسب لكم:
+            1. اختر يوم الخميس المناسب لكم:
           </label>
           <span className="text-[11px] text-amber-900 font-bold bg-amber-100 px-3 py-0.5 rounded-full border border-amber-300">
             أيام الخميس المتاحة 🗓️
@@ -195,7 +154,7 @@ export default function StepDateTime({
       <div className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
           <label className="block text-xs font-bold text-slate-700">
-            3. اختر التوقيت (ابتداءً من 17:00):
+            2. اختر التوقيت (ابتداءً من 17:00):
           </label>
           <span className="text-[11px] text-slate-500 font-medium">
             مدة كل مقابلة: 20 دقيقة
@@ -261,13 +220,7 @@ export default function StepDateTime({
 
       {/* Nav Buttons */}
       <div className="flex justify-between items-center pt-4 border-t border-slate-200">
-        <button
-          onClick={onBack}
-          className="px-6 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
-        >
-          <ArrowRight className="w-4 h-4" />
-          <span>السابق</span>
-        </button>
+        <span />
 
         <button
           disabled={!selectedDate || !selectedSlot}
@@ -278,7 +231,7 @@ export default function StepDateTime({
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           }`}
         >
-          <span>المتابعة لبيانات المواطن</span>
+          <span>التالي: معلوماتكم</span>
           <ArrowLeft className="w-4 h-4" />
         </button>
       </div>

@@ -1,6 +1,13 @@
 // API Client for Dr. Amine Nokta Parliamentary Appointment System
 
 const API_BASE = '/api';
+export const ADMIN_TOKEN_KEY = 'nokta_admin_token';
+
+function authHeaders(extra = {}) {
+  let token = '';
+  try { token = localStorage.getItem(ADMIN_TOKEN_KEY) || ''; } catch (e) { /* storage unavailable */ }
+  return token ? { ...extra, Authorization: `Bearer ${token}` } : extra;
+}
 
 async function safeFetchJson(url, options = {}) {
   let res;
@@ -8,6 +15,13 @@ async function safeFetchJson(url, options = {}) {
     res = await fetch(url, options);
   } catch (err) {
     throw new Error('تعذر الاتصال بالخادم. يرجى التحقق من اتصال الشبكة.');
+  }
+
+  if (res.status === 401) {
+    const body = await res.json().catch(() => ({}));
+    const err = new Error(body.error || 'انتهت الجلسة، المرجو تسجيل الدخول من جديد');
+    err.status = 401;
+    throw err;
   }
 
   const contentType = res.headers.get('content-type') || '';
@@ -56,7 +70,7 @@ export async function fetchAppointments(filters = {}) {
   if (filters.date) params.append('date', filters.date);
   if (filters.search) params.append('search', filters.search);
 
-  const data = await safeFetchJson(`${API_BASE}/appointments?${params.toString()}`);
+  const data = await safeFetchJson(`${API_BASE}/appointments?${params.toString()}`, { headers: authHeaders() });
   if (!data.success) throw new Error(data.error || 'فشل تحميل المواعيد');
   return data.data;
 }
@@ -64,7 +78,7 @@ export async function fetchAppointments(filters = {}) {
 export async function updateAppointment(id, updates) {
   const data = await safeFetchJson(`${API_BASE}/appointments/${id}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(updates),
   });
   if (!data.success) throw new Error(data.error || 'فشل تحديث الموعد');
@@ -74,6 +88,7 @@ export async function updateAppointment(id, updates) {
 export async function deleteAppointment(id) {
   const data = await safeFetchJson(`${API_BASE}/appointments/${id}`, {
     method: 'DELETE',
+    headers: authHeaders(),
   });
   if (!data.success) throw new Error(data.error || 'فشل حذف الموعد');
   return data;
@@ -82,6 +97,7 @@ export async function deleteAppointment(id) {
 export async function generateWhatsAppLink(id) {
   const data = await safeFetchJson(`${API_BASE}/appointments/${id}/whatsapp`, {
     method: 'POST',
+    headers: authHeaders(),
   });
   if (!data.success) throw new Error(data.error || 'فشل إنشاء رابط الواتساب');
   return data;

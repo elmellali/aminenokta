@@ -61,16 +61,6 @@ export default function AdminPortal() {
     }
   };
 
-  const handleQuickDemoLogin = () => {
-    setPassword('nokta2026');
-    adminLogin('nokta2026').then((user) => {
-      setIsAuthenticated(true);
-      setCurrentUser(user);
-      localStorage.setItem('nokta_admin_token', user.token);
-      loadDashboardData();
-    }).catch(console.error);
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('nokta_admin_token');
     setIsAuthenticated(false);
@@ -89,6 +79,7 @@ export default function AdminPortal() {
       setStats(st);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
+      if (err.status === 401) handleLogout();
     } finally {
       setLoadingData(false);
     }
@@ -104,6 +95,7 @@ export default function AdminPortal() {
       setTimeout(() => setUpdateSuccess(''), 3000);
       loadDashboardData();
     } catch (err) {
+      if (err.status === 401) return handleLogout();
       alert(err.message);
     }
   };
@@ -121,6 +113,7 @@ export default function AdminPortal() {
       setUpdateSuccess('تم حفظ محضر الملاحظات والقاعة بنجاح');
       setTimeout(() => setUpdateSuccess(''), 3000);
     } catch (err) {
+      if (err.status === 401) return handleLogout();
       alert(err.message);
     }
   };
@@ -131,6 +124,7 @@ export default function AdminPortal() {
       const { url } = await generateWhatsAppLink(aptId);
       window.open(url, '_blank');
     } catch (err) {
+      if (err.status === 401) return handleLogout();
       alert(err.message);
     }
   };
@@ -206,19 +200,6 @@ export default function AdminPortal() {
             </button>
           </form>
 
-          {/* Quick Demo Access Helper */}
-          <div className="pt-4 border-t border-slate-100">
-            <span className="text-[11px] text-slate-400 block mb-2">
-              (وصول سريع للاختبار والتجربة):
-            </span>
-            <button
-              type="button"
-              onClick={handleQuickDemoLogin}
-              className="w-full py-2 bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold rounded-xl transition-colors cursor-pointer"
-            >
-              دخول بنقرة واحدة كديوان النائب د. أمين نقطى
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -441,7 +422,7 @@ export default function AdminPortal() {
                     </td>
 
                     <td className="p-3.5">
-                      <div className="font-bold text-slate-800">{apt.communeName}</div>
+                      <div className="font-bold text-slate-800">{apt.communeName || 'غير محدد'}</div>
                       <div className="text-[11px] text-slate-500">{apt.neighborhood}</div>
                     </td>
 
@@ -559,7 +540,7 @@ export default function AdminPortal() {
                 </div>
                 <div>
                   <span className="text-slate-400 font-bold block mb-0.5">الانتماء:</span>
-                  <p className="font-black text-[#00274d]">{activeAppointment.communeName}</p>
+                  <p className="font-black text-[#00274d]">{activeAppointment.communeName || 'غير محدد'}</p>
                   <p className="text-slate-600">الحي: {activeAppointment.neighborhood}</p>
                   <p className="text-slate-600">الموعد: {activeAppointment.preferredDate} ({activeAppointment.timeSlot})</p>
                 </div>

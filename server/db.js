@@ -20,8 +20,8 @@ const DEFAULT_CONFIG = {
     mainReceptionDay: 'كل خميس على الساعة 17:00 (5 زوالاً)',
     officeAddress: 'مقر حزب التجمع الوطني للأحرار، مديونة المركز (شارع الحسن الثاني، قرب بلدية مديونة)، إقليم مديونة',
     googleMapsUrl: 'https://maps.google.com/?q=Mediouna+Morocco',
-    phone: '+212 5 22 51 04 20',
-    whatsapp: '+212 6 61 98 42 10',
+    phone: '+212 6 12 26 64 18',
+    whatsapp: '+212 6 12 26 64 18',
     email: 'contact@aminenokta.ma',
     photoUrl: '/images/dr_amine_nokta.jpg'
   },
@@ -94,79 +94,6 @@ const DEFAULT_CONFIG = {
   }
 };
 
-// Seed initial realistic appointments for Thursday 17h
-const SEED_APPOINTMENTS = [
-  {
-    id: 'apt-001',
-    trackingCode: 'NOKTA-MDN-7412',
-    fullName: 'عبد الرحيم البوهالي',
-    cin: 'BK394821',
-    phone: '0661234567',
-    email: 'a.bouhali@gmail.com',
-    communeId: 'sidi_hajjaj',
-    communeName: 'جماعة سيدي حجاج واد حصار',
-    neighborhood: 'أولاد حادة',
-    purposeId: 'advocacy_social',
-    purposeTitle: 'ملف اجتماعي / صحة / تعليم ونقل مدرسي',
-    subject: 'طلب الترافع لتوفير حافلات إضافية للنقل المدرسي لتلاميذ أولاد حادة',
-    details: 'صعوبة تنقل التلاميذ اليومي من الدواوير إلى الإعدادية ونلتمس الترافع لدى المصالح الإقليمية.',
-    appointmentType: 'in_person',
-    preferredDate: '2026-11-05',
-    timeSlot: '17:00',
-    status: 'confirmed',
-    adminNotes: 'موعد مؤكد لجلسة الخميس بمقر الحزب.',
-    assignedRoom: 'قاعة الاستقبالات - مقر الحزب بمديونة',
-    createdAt: '2026-10-24T10:15:00Z',
-    updatedAt: '2026-10-25T14:20:00Z'
-  },
-  {
-    id: 'apt-002',
-    trackingCode: 'NOKTA-MDN-8394',
-    fullName: 'فاطمة الزهراء المرابط',
-    cin: 'BK450123',
-    phone: '0672889911',
-    email: 'fz.morabit@yahoo.fr',
-    communeId: 'tit_mellil',
-    communeName: 'باشوية تيط مليل',
-    neighborhood: 'حي الوفاء',
-    purposeId: 'youth_employment',
-    purposeTitle: 'تشغيل الشباب وتوجيه مهني واستثماري',
-    subject: 'تنسيق مع الفاعلين الاقتصاديين لإدماج خريجي التكوين المهني بتيط مليل',
-    details: 'ملف خريجي التكوين المهني لربطهم بفرص الشغل المتاحة بالوحدات الصناعية لتيط مليل.',
-    appointmentType: 'in_person',
-    preferredDate: '2026-11-05',
-    timeSlot: '17:20',
-    status: 'confirmed',
-    adminNotes: 'موعد مؤكد.',
-    assignedRoom: 'مقر الحزب بمديونة',
-    createdAt: '2026-10-25T09:30:00Z',
-    updatedAt: '2026-10-26T11:00:00Z'
-  },
-  {
-    id: 'apt-003',
-    trackingCode: 'NOKTA-MDN-5128',
-    fullName: 'المختار بن الشريف',
-    cin: 'BK209483',
-    phone: '0663456789',
-    email: '',
-    communeId: 'lahraouyine',
-    communeName: 'باشوية الهراويين',
-    neighborhood: 'مشروع البركة',
-    purposeId: 'complaint_infra',
-    purposeTitle: 'شكاية / تظلم بنية تحتية وخدمات عمومية',
-    subject: 'ملف الإنارة العمومية وتعبيد المقطع الطرقي المؤدي للمدرسة',
-    details: 'طلب تدخل لإصلاح مصابيح الإنارة العمومية وإعادة تهيئة الطريق.',
-    appointmentType: 'in_person',
-    preferredDate: '2026-11-12',
-    timeSlot: '17:40',
-    status: 'pending',
-    adminNotes: 'قيد مراجعة ديوان النائب.',
-    assignedRoom: null,
-    createdAt: '2026-10-27T16:40:00Z',
-    updatedAt: '2026-10-27T16:40:00Z'
-  }
-];
-
 // Helper Functions
 function readJson(file, defaultValue) {
   try {
@@ -198,7 +125,7 @@ const db = {
     return newConfig;
   },
 
-  getAppointments: () => readJson(APPOINTMENTS_FILE, SEED_APPOINTMENTS),
+  getAppointments: () => readJson(APPOINTMENTS_FILE, []),
 
   getAppointmentById: (id) => {
     const appointments = db.getAppointments();
